@@ -42,18 +42,24 @@ exports.deleteBook = catchAsync(async (req, res, next) => {
 });
 
 exports.searchBooks = catchAsync(async (req, res, next) => {
-    const { title, author } = req.body;
-    const query = {};
-    if (title) query.title = new RegExp(title, 'i');
-    if (author) query.author = new RegExp(author, 'i');
-    const books = await Book.find(query);
-    if (!books.length) {
-        return res.status(404).json({ message: 'No books found matching your criteria.' });
-    }
-
-    res.status(200).json({
-        status: 'success',
-        results: books.length,
-        data: books
-    });
+    try {
+        const { title, author } = req.body;
+        const query = {};
+        if (title) query.title = new RegExp(title, 'i');
+        if (author) query.author = new RegExp(author, 'i');
+        const books = await Book.find(query);
+        if (!books.length) {
+          return res.status(404).json({ message: 'No books found matching your criteria.' });
+        }
+      
+        res.status(200).json({
+          status: 'success',
+          results: books.length,
+          data: books
+        });
+      } catch (error) {
+        console.error('Error fetching books:', error);
+        res.status(500).json({ message: 'Internal server error' });
+      }
+      
 }); 
